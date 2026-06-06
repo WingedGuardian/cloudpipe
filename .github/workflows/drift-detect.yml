@@ -1,0 +1,70 @@
+name: Drift Detection
+
+on:
+  schedule:
+    - cron: '0 9 * * 1'  # mondays 9am UTC
+  workflow_dispatch: {}
+
+permissions:
+  id-token: write
+  contents: read
+  issues: write
+
+env:
+  TF_DIR: terraform/environments/dev
+  AWS_REGION: us-east-1
+
+jobs:
+  detect:
+    name: Check for Drift
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ vars.CI_PLAN_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "1.9"
+
+      - name: terraform init
+        run: terraform init
+        working-directory: ${{ env.TF_DIR }}
+
+      # exit 2 = drift--open an issue so it doesn't vanish in the Actions log nobody checks
+      # exit code 2 = changes detected (drift)
+      - name: check drift
+        id: drift
+        run: |
+          set +e
+          terraform plan -detailed-exitcode -out=drift.tfplan 2>&1 | tee plan-output.txt
+          echo "exitcode=$?" >> "$GITHUB_OUTPUT"
+        working-directory: ${{ env.TF_DIR }}
+
+      - name: open issue on drift
+        if: steps.drift.outputs.exitcode == '2'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const plan = fs.readFileSync(
+              process.env.TF_DIR + '/plan-output.txt', 'utf8'
+            ).slice(0, 3000);
+            await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: 'Infrastructure drift detected',
+              body: [
+                'Weekly drift check found changes not in Terraform state.',
+                '',
+                '```',
+                plan,
+                '```',
+                '',
+                'Run `terraform plan` locally to review.'
+              ].join('\n'),
+              labels: ['drift', 'infrastructure']
+            });

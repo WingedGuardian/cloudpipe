@@ -1,0 +1,36 @@
+# Python
+__pycache__/
+*.pyc
+.venv/
+*.egg-info/
+dist/
+build/
+
+# Terraform
+.terraform/
+*.tfstate
+*.tfstate.backup
+*.tfplan
+.terraform.lock.hcl
+crash.log
+
+# Secrets — never commit
+*.tfvars
+!terraform/environments/dev/terraform.tfvars.example
+!terraform/environments/prod/terraform.tfvars.example
+secrets.env
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+
+# Infracost
+.infracost/
+
+# Test artifacts
+.pytest_cache/
+htmlcov/
+.coverage

@@ -1,0 +1,53 @@
+name: Terraform Apply
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'terraform/**'
+
+permissions:
+  id-token: write
+  contents: read
+
+env:
+  TF_DIR: terraform/environments/dev
+  AWS_REGION: us-east-1
+
+jobs:
+  apply:
+    name: Apply
+    runs-on: ubuntu-latest
+    environment: production  # requires manual approval in GH settings
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ vars.CI_APPLY_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "1.9"
+
+      - name: terraform init
+        run: terraform init
+        working-directory: ${{ env.TF_DIR }}
+
+      - name: terraform apply
+        run: terraform apply -auto-approve
+        working-directory: ${{ env.TF_DIR }}
+
+      # save a plan snapshot after apply for drift detection baseline
+      - name: drift baseline
+        run: |
+          terraform plan -out=baseline.tfplan -detailed-exitcode || true
+          terraform show -json baseline.tfplan > baseline.json
+        working-directory: ${{ env.TF_DIR }}
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: drift-baseline
+          path: ${{ env.TF_DIR }}/baseline.json
+          retention-days: 30

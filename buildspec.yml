@@ -1,0 +1,19 @@
+version: 0.2
+
+env:
+  variables:
+    ECR_REPO: 287528889916.dkr.ecr.us-east-1.amazonaws.com/cloudpipe
+    IMAGE_TAG: v1
+
+phases:
+  pre_build:
+    commands:
+      - aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 287528889916.dkr.ecr.us-east-1.amazonaws.com
+  build:
+    commands:
+      - cd container
+      - docker build -t $ECR_REPO:$IMAGE_TAG .
+  post_build:
+    commands:
+      - docker push $ECR_REPO:$IMAGE_TAG
+      - echo "Image pushed to $ECR_REPO:$IMAGE_TAG"

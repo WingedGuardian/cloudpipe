@@ -1,0 +1,2 @@
+github_org      = "YourGitHubOrg"
+container_image = "your-account.dkr.ecr.us-east-1.amazonaws.com/cloudpipe:latest"
