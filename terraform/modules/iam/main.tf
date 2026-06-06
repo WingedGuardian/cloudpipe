@@ -256,9 +256,12 @@ resource "aws_iam_role_policy" "execution_secrets" {
   policy = jsonencode({
     Version = "2012-10-17"
     Statement = [{
-      Effect   = "Allow"
-      Action   = "secretsmanager:GetSecretValue"
-      Resource = "arn:aws:secretsmanager:${var.region}:${var.account_id}:secret:cloudpipe/${var.environment}/*"
+      Effect = "Allow"
+      Action = "secretsmanager:GetSecretValue"
+      Resource = [
+        "arn:aws:secretsmanager:${var.region}:${var.account_id}:secret:cloudpipe/${var.environment}/*",
+        "arn:aws:secretsmanager:${var.region}:${var.account_id}:secret:rds!*"
+      ]
     }]
   })
 }

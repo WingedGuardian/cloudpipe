@@ -100,8 +100,8 @@ resource "aws_ecs_task_definition" "app" {
   task_role_arn            = var.task_role_arn
   runtime_platform {
     operating_system_family = "LINUX"
-    # ARM64 on Fargate is a free 20% savings--no code changes for a Python container
-    cpu_architecture        = "ARM64"
+    # X86_64 for build simplicity; ARM64 (Graviton) is the production optimization path
+    cpu_architecture        = "X86_64"
   }
 
   container_definitions = jsonencode([{
