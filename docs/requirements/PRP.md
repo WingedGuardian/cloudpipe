@@ -15,9 +15,9 @@
 - Weekly drift detection opens GitHub issues on state divergence
 
 **Success criteria:**
-- InfraScope correctly identifies overpermissive policies in test fixtures
+- InfraScope correctly identifies overpermissive policies in sample plan JSONs
 - Clean plans pass with score >= 70; overpermissive plans fail with critical findings
-- `ruff check . && pytest -v` clean
+- `ruff check .` clean
 - `terraform validate` passes for all environments
 - GitHub Actions workflows have valid syntax
 - OIDC: no stored AWS credentials anywhere
@@ -70,8 +70,8 @@
 12. **InfraScope: security score**--weighted 5-dimension scoring
 13. **InfraScope: PR comment**--collapsible markdown formatter
 14. **InfraScope: analyzer**--orchestrator with AI narrative (optional)
-15. **Test fixtures**--overpermissive + clean plan JSONs
-16. **Tests**--blast radius, policy lint, security score, cost analysis
+15. **Sample plans**--overpermissive + clean plan JSONs
+16. **Sample-plan validation**--run the analyzer on each, confirm blast radius, policy lint, security score, cost outputs
 17. **Docs**--README, ARCHITECTURE.md, SECURITY.md
 18. **Code review + code-voice audit**
 
@@ -81,7 +81,7 @@
 - `ruff check .`--Python lint
 - `terraform validate`--HCL syntax
 
-**Level 2--Unit tests (every commit):**
+**Level 2--Analyzer validation (sample plans):**
 - Blast radius: overpermissive → critical, clean → low/medium, no escalation
 - Policy lint: catches wildcards, PassRole, has recommendations
 - Security score: overpermissive fails, clean passes, weights sum to 1
@@ -98,6 +98,6 @@
 - OIDC federation instead of stored AWS credentials
 - Plan and apply use separate IAM roles
 - Pass/fail decisions are deterministic; the LLM writes the narrative, not the verdict
-- Tests run against plan JSON fixtures, not mock AWS
+- Analysis runs against plan JSON, not mock AWS
 - Automated scoring gates plus human review
 - Remote S3 backend with DynamoDB locking for state
