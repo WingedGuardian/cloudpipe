@@ -18,6 +18,8 @@ jobs:
   detect:
     name: Check for Drift
     runs-on: ubuntu-latest
+    # skips gracefully until the OIDC plan role is configured (vars.CI_PLAN_ROLE_ARN)
+    if: ${{ vars.CI_PLAN_ROLE_ARN != '' }}
     steps:
       - uses: actions/checkout@v4
 

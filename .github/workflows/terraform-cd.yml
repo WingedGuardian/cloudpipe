@@ -19,6 +19,8 @@ jobs:
     name: Apply
     runs-on: ubuntu-latest
     environment: production  # requires manual approval in GH settings
+    # skips gracefully until the OIDC apply role is configured (vars.CI_APPLY_ROLE_ARN)
+    if: ${{ vars.CI_APPLY_ROLE_ARN != '' }}
     steps:
       - uses: actions/checkout@v4
 

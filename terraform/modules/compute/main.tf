@@ -101,7 +101,7 @@ resource "aws_ecs_task_definition" "app" {
   runtime_platform {
     operating_system_family = "LINUX"
     # X86_64 for build simplicity; ARM64 (Graviton) is the production optimization path
-    cpu_architecture        = "X86_64"
+    cpu_architecture = "X86_64"
   }
 
   container_definitions = jsonencode([{
