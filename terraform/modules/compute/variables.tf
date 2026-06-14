@@ -1,10 +1,10 @@
-variable "environment" {}
-variable "region" {}
-variable "vpc_id" {}
+variable "environment" { type = string }
+variable "region" { type = string }
+variable "vpc_id" { type = string }
 variable "public_subnet_ids" { type = list(string) }
 variable "private_subnet_ids" { type = list(string) }
-variable "task_role_arn" {}
-variable "execution_role_arn" {}
-variable "db_endpoint" {}
-variable "db_secret_arn" {}
-variable "container_image" {}
+variable "task_role_arn" { type = string }
+variable "execution_role_arn" { type = string }
+variable "db_endpoint" { type = string }
+variable "db_secret_arn" { type = string }
+variable "container_image" { type = string }
